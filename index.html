@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Life OS (Vanilla)</title>
+
+    <link rel="stylesheet" href="./styles/themes.css" />
+    <link rel="stylesheet" href="./styles/base.css" />
+    <link rel="stylesheet" href="./styles/layout.css" />
+    <link rel="stylesheet" href="./styles/components.css" />
+  </head>
+  <body>
+    <div id="app-shell">
+      <!-- Navbar goes here -->
+      <aside id="sidebar"></aside>
+
+      <!-- Main content -->
+      <main id="main">
+        <header id="topbar">
+          <div class="topbar-left">
+            <button id="sidebarToggle" class="icon-btn" aria-label="Toggle sidebar">
+              ☰
+            </button>
+            <h1 id="pageTitle" class="page-title">Life OS</h1>
+          </div>
+          <div class="topbar-right">
+            <button id="themeToggle" class="btn btn-ghost" type="button">Toggle theme</button>
+          </div>
+        </header>
+
+        <section id="content" class="content"></section>
+      </main>
+    </div>
+
+    <!-- UI Layers -->
+    <div id="modalRoot"></div>
+    <div id="toastRoot" aria-live="polite" aria-atomic="true"></div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+#app-shell {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  height: 100vh;
+}
+
+#sidebar {
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  padding: 18px;
+  overflow: auto;
+}
+
+#main {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+}
+
+#topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in oklab, var(--panel) 88%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.content {
+  padding: 18px;
+  overflow: auto;
+}
+
+@media (max-width: 980px) {
+  #app-shell {
+    grid-template-columns: 1fr;
+  }
+  #sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 280px;
+    transform: translateX(-110%);
+    transition: transform 180ms ease;
+    z-index: 50;
+  }
+  #sidebar.is-open {
+    transform: translateX(0);
+  }
+}
