@@ -25,8 +25,11 @@
             <h1 id="pageTitle" class="page-title">Life OS</h1>
           </div>
           <div class="topbar-right">
+            <input id="globalSearch" class="input" placeholder="Search..." style="max-width:260px" />
+            <button id="globalSearchBtn" class="btn btn-ghost" type="button">Search</button>
             <button id="themeToggle" class="btn btn-ghost" type="button">Toggle theme</button>
           </div>
+
         </header>
 
         <section id="content" class="content"></section>
@@ -37,6 +40,6 @@
     <div id="modalRoot"></div>
     <div id="toastRoot" aria-live="polite" aria-atomic="true"></div>
 
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="./src/main.js"></script>
   </body>
 </html>

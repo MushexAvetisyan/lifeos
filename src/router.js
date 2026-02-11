@@ -6,8 +6,13 @@ export function registerRoute(path, loader) {
 
 export function getCurrentPath() {
   const hash = location.hash || "#/dashboard";
-  const path = hash.replace(/^#/, "");
-  return path.startsWith("/") ? path : `/${path}`;
+  let path = hash.replace(/^#/, "");
+  if (!path.startsWith("/")) path = `/${path}`;
+
+  // ✅ important: remove query string (?date=...)
+  path = path.split("?")[0];
+
+  return path;
 }
 
 export async function resolveRoute() {

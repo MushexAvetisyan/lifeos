@@ -2,9 +2,13 @@ console.log("✅ main.js loaded");
 
 import { startRouter, registerRoute } from "./router.js";
 import { getState, subscribe } from "./store.js";
-import { Navbar } from "./components/Navbar.js";
-import { initToasts, toast } from "./components/Toast.js";
-import { initModal } from "./components/Modal.js";
+import { Navbar } from "./components/navbar.js";
+import { initToasts, toast } from "./components/toast.js";
+import { initModal } from "./components/modal.js";
+import { initCommandPalette } from "./components/commandPalette.js";
+import { initSearchEverywhere } from "./components/searchEverywhere.js";
+
+
 
 const sidebar = document.querySelector("#sidebar");
 const content = document.querySelector("#content");
@@ -12,6 +16,11 @@ const pageTitleEl = document.querySelector("#pageTitle");
 
 initToasts(document.querySelector("#toastRoot"));
 initModal(document.querySelector("#modalRoot"));
+initSearchEverywhere({
+  inputEl: document.querySelector("#globalSearch"),
+  buttonEl: document.querySelector("#globalSearchBtn"),
+});
+initCommandPalette();
 
 registerRoute("/dashboard", () => import("./pages/dashboard.js"));
 registerRoute("/tasks", () => import("./pages/tasks.js"));
@@ -19,6 +28,13 @@ registerRoute("/habits", () => import("./pages/habits.js"));
 registerRoute("/learning", () => import("./pages/learning.js"));
 registerRoute("/analytics", () => import("./pages/analytics.js"));
 registerRoute("/settings", () => import("./pages/settings.js"));
+
+registerRoute("/templates", () => import("./pages/templates.js"));
+registerRoute("/calendar", () => import("./pages/calendar.js"));
+registerRoute("/day", () => import("./pages/day.js"));
+registerRoute("/explorer", () => import("./pages/explorer.js"));
+
+registerRoute("/search", () => import("./pages/search.js"));
 
 applyTheme(getState());
 subscribe(applyTheme);

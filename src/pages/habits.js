@@ -1,8 +1,8 @@
 // src/pages/habits.js
 import { getState, setState } from "../store.js";
 import { uid, todayISO } from "../utils.js";
-import { openModal } from "../components/Modal.js";
-import { toast } from "../components/Toast.js";
+import { openModal } from "../components/modal.js";
+import { toast } from "../components/toast.js";
 
 export function pageTitle() { return "Habits"; }
 

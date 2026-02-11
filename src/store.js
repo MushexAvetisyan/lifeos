@@ -13,8 +13,22 @@ const defaultState = {
   habits: [],
   topics: [],
   lessons: [],
-  timeLogs: []
+  timeLogs: [],
+
+  templates: {
+    taskSets: [],
+    habitSets: []
+  }
+
 };
+
+
+export function resetAllData() {
+  localStorage.removeItem(KEY);           // ✅ удаляем правильный ключ
+  state = structuredClone(defaultState);  // ✅ чистое состояние
+  save();                                 // ✅ сохраняем пустое
+  listeners.forEach((fn) => fn(state));   // ✅ уведомляем UI
+}
 
 let state = load();
 const listeners = new Set();
@@ -35,8 +49,9 @@ export function getState() {
 }
 
 export function setState(updater) {
-  const next = typeof updater === "function" ? updater(structuredClone(state)) : updater;
-  state = next;
+  const draft = structuredClone(state);
+  const res = typeof updater === "function" ? updater(draft) : updater;
+  state = res ?? draft; // ✅ если вернули undefined — берём draft
   save();
   listeners.forEach((fn) => fn(state));
 }

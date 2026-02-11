@@ -1,155 +1,187 @@
-import { getState, setState, exportState, importState, resetState } from "../../styles/src/store.js";
-import { toast } from "../components/Toast.js";
-import { openModal } from "../components/Modal.js";
+// src/pages/settings.js
+import { getState, setState, resetAllData } from "../store.js";
+import { toast } from "../components/toast.js";
+import { openModal } from "../components/modal.js";
 
-export function pageTitle() { return "Settings"; }
+export function pageTitle() {
+  return "Settings";
+}
 
 export function render() {
-  const s = getState();
-
   const root = document.createElement("div");
-  root.className = "grid cols-2";
+  root.className = "grid";
+  root.style.gap = "12px";
 
-  // Theme / Accent
-  root.appendChild(card("Appearance", appearanceForm(s)));
+  root.appendChild(themeCard());
+  root.appendChild(dataCard());
 
-  // Backup
-  root.appendChild(card("Backup", backupPanel()));
-
-  // Danger zone
-  root.appendChild(card("Danger zone", dangerPanel()));
-
+  repaint();
   return root;
 
-  function appearanceForm(state) {
-    const wrap = document.createElement("div");
-    wrap.className = "grid";
-    wrap.innerHTML = `
-      <label>
-        <div style="color:var(--muted);font-size:12px;margin-bottom:6px">Theme</div>
-        <select class="select" id="themeSelect">
-          <option value="dark">Dark</option>
-          <option value="light">Light</option>
-        </select>
-      </label>
+  function repaint() {
+    const s = getState();
+    // apply in DOM too (store subscription обычно делает это, но пусть будет дубль)
+    document.documentElement.dataset.theme = s.settings?.theme || "dark";
+    document.documentElement.style.setProperty("--accent", s.settings?.accent || "#7c3aed");
+  }
 
-      <label>
-        <div style="color:var(--muted);font-size:12px;margin-bottom:6px">Accent color</div>
-        <input class="input" id="accentInput" type="color" value="${escapeHTML(state.settings.accent)}" />
-      </label>
+  function themeCard() {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="card-body" style="display:grid;gap:12px">
+        <div style="font-weight:900;font-size:16px">Appearance</div>
+        <div class="row wrap" style="gap:12px;align-items:flex-end">
 
-      <div class="row wrap">
-        <button class="btn btn-primary" id="saveAppearance" type="button">Save</button>
+          <label style="min-width:220px">
+            <div style="color:var(--muted);font-size:12px;margin-bottom:6px">Theme</div>
+            <select class="select" id="themeSelect">
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
+            </select>
+          </label>
+
+          <label style="min-width:220px">
+            <div style="color:var(--muted);font-size:12px;margin-bottom:6px">Accent color</div>
+            <input class="input" id="accentInput" type="color" />
+          </label>
+
+          <button class="btn btn-ghost" id="accentReset" type="button">Reset accent</button>
+        </div>
+
+        <div class="row wrap" style="gap:10px">
+          <button class="btn" id="applyBtn" type="button">Apply</button>
+          <span style="color:var(--muted);font-size:12px">Changes are saved locally.</span>
+        </div>
       </div>
     `;
 
-    wrap.querySelector("#themeSelect").value = state.settings.theme;
+    const themeSelect = card.querySelector("#themeSelect");
+    const accentInput = card.querySelector("#accentInput");
+    const applyBtn = card.querySelector("#applyBtn");
+    const accentReset = card.querySelector("#accentReset");
 
-    wrap.querySelector("#saveAppearance").addEventListener("click", () => {
-      const theme = wrap.querySelector("#themeSelect").value;
-      const accent = wrap.querySelector("#accentInput").value;
+    const s = getState();
+    themeSelect.value = s.settings?.theme || "dark";
+    accentInput.value = s.settings?.accent || "#7c3aed";
 
+    applyBtn.addEventListener("click", () => {
+      const theme = themeSelect.value === "light" ? "light" : "dark";
+      const accent = accentInput.value || "#7c3aed";
       setState((st) => {
+        st.settings = st.settings || { theme: "dark", accent: "#7c3aed" };
         st.settings.theme = theme;
         st.settings.accent = accent;
         return st;
       });
-
-      toast("Saved appearance.");
+      toast(`Saved: ${theme}, ${accent}`);
+      repaint();
     });
 
-    return wrap;
+    accentReset.addEventListener("click", () => {
+      accentInput.value = "#7c3aed";
+      applyBtn.click();
+    });
+
+    return card;
   }
 
-  function backupPanel() {
-    const wrap = document.createElement("div");
-    wrap.className = "grid";
-    wrap.innerHTML = `
-      <div style="color:var(--muted);font-size:13px">
-        Export your data to a JSON file, or import it back later.
-      </div>
-      <div class="row wrap">
-        <button class="btn btn-primary" id="exportBtn" type="button">Export JSON</button>
-        <button class="btn" id="importBtn" type="button">Import JSON</button>
+  function dataCard() {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="card-body" style="display:grid;gap:12px">
+        <div style="font-weight:900;font-size:16px">Data</div>
+
+        <div class="row wrap" style="gap:10px">
+          <button class="btn btn-primary" id="exportBtn" type="button">Backup (Export JSON)</button>
+          <button class="btn" id="importBtn" type="button">Restore (Import JSON)</button>
+          <button class="btn btn-danger" id="resetBtn" type="button">Reset all data</button>
+        </div>
+
+        <div style="color:var(--muted);font-size:12px">
+          Backup exports your full Life OS state (tasks, habits, learning, settings).
+        </div>
       </div>
     `;
 
-    wrap.querySelector("#exportBtn").addEventListener("click", () => {
-      const data = exportState();
-      const blob = new Blob([data], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `life-os-backup-${new Date().toISOString().slice(0,10)}.json`;
-      a.click();
-      URL.revokeObjectURL(a.href);
-      toast("Backup exported.");
-    });
+    card.querySelector("#exportBtn").addEventListener("click", exportAll);
+    card.querySelector("#importBtn").addEventListener("click", importAll);
+    card.querySelector("#resetBtn").addEventListener("click", confirmReset);
 
-    wrap.querySelector("#importBtn").addEventListener("click", () => {
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = "application/json";
-      input.addEventListener("change", async () => {
-        const file = input.files?.[0];
-        if (!file) return;
+    return card;
+  }
+
+  function exportAll() {
+    const s = getState();
+    const data = JSON.stringify(s, null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `life-os-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast("Backup exported.");
+  }
+
+  function importAll() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/json";
+    input.addEventListener("change", async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      try {
         const text = await file.text();
-        try {
-          importState(text);
-          toast("Backup imported.");
-          location.hash = "#/dashboard";
-        } catch (e) {
-          toast(`Import failed: ${e.message}`);
+        const next = JSON.parse(text);
+
+        // minimal validation
+        if (!next || typeof next !== "object") throw new Error("Invalid JSON.");
+        if (!("tasks" in next) && !("habits" in next) && !("topics" in next)) {
+          throw new Error("Not a Life OS backup.");
         }
-      });
-      input.click();
-    });
 
-    return wrap;
+        setState((st) => {
+          // Replace the whole state safely (merge with existing defaults already handled by store.load usually)
+          return Object.assign(st, next);
+        });
+
+        toast("Backup imported.");
+        repaint();
+        // optional reload to ensure all pages see it
+        // location.reload();
+      } catch (e) {
+        toast(`Import failed: ${e.message}`);
+      }
+    });
+    input.click();
   }
 
-  function dangerPanel() {
-    const wrap = document.createElement("div");
-    wrap.className = "grid";
-    wrap.innerHTML = `
-      <div style="color:var(--muted);font-size:13px">
-        This will wipe all local data for Life OS on this browser.
-      </div>
-      <button class="btn btn-danger" id="resetBtn" type="button">Reset all data</button>
-    `;
-
-    wrap.querySelector("#resetBtn").addEventListener("click", () => {
-      openModal({
-        title: "Reset all data?",
-        content: `<div style="color:var(--muted);font-size:13px">
-          This cannot be undone. Export a backup first if you want.
-        </div>`,
-        actions: [
-          { label: "Cancel", className: "btn", onClick: (close) => close() },
-          { label: "Reset", className: "btn btn-danger", onClick: (close) => { resetState(); toast("Data reset."); close(); location.hash = "#/dashboard"; } }
-        ]
-      });
+  function confirmReset() {
+    openModal({
+      title: "Reset all data?",
+      content: `<div style="color:var(--muted);font-size:13px">
+        This will delete tasks, habits, learning, analytics logs, and settings from this browser.
+        <br/><br/>
+        Tip: Export a backup first.
+      </div>`,
+      actions: [
+        { label: "Cancel", className: "btn", onClick: (close) => close() },
+        {
+          label: "Reset",
+          className: "btn btn-danger",
+          onClick: (close) => {
+            resetAllData?.(); // if you have it
+            // fallback if store doesn't have resetAllData
+            try {
+              localStorage.removeItem("life_os_state");
+            } catch {}
+            close();
+            toast("Data reset. Reloading…");
+            location.reload();
+          },
+        },
+      ],
     });
-
-    return wrap;
   }
-}
-
-function card(title, bodyEl) {
-  const c = document.createElement("div");
-  c.className = "card";
-  const header = document.createElement("div");
-  header.className = "card-header";
-  header.innerHTML = `<div class="card-title">${escapeHTML(title)}</div>`;
-  const body = document.createElement("div");
-  body.className = "card-body";
-  body.appendChild(bodyEl);
-  c.appendChild(header);
-  c.appendChild(body);
-  return c;
-}
-
-function escapeHTML(s) {
-  return String(s).replace(/[&<>"']/g, (c) => (
-    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[c]
-  ));
 }

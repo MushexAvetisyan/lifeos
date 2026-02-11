@@ -1,8 +1,8 @@
 // src/pages/tasks.js
 import { getState, setState } from "../store.js";
 import { uid, todayISO, formatDate } from "../utils.js";
-import { openModal } from "../components/Modal.js";
-import { toast } from "../components/Toast.js";
+import { openModal } from "../components/modal.js";
+import { toast } from "../components/toast.js";
 
 export function pageTitle() { return "Tasks"; }
 

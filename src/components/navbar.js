@@ -25,6 +25,10 @@ export function Navbar({ activePath }) {
     { path: "/habits", label: "Habits" },
     { path: "/learning", label: "Learning" },
     { path: "/analytics", label: "Analytics" },
+    { path: "/templates", label: "Templates" },
+    { path: "/calendar", label: "Calendar" },
+    { path: "/explorer", label: "Explorer" },
+    { path: "/search", label: "Search" },
     { path: "/settings", label: "Settings" },
   ];
 
