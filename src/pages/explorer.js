@@ -92,7 +92,7 @@ export function render() {
     const tableCard = document.createElement("div");
     tableCard.className = "card";
     tableCard.innerHTML = `
-    <div class="card-body" style="display:grid;gap:10px">
+    <div class="table-wrap" style="display:grid;gap:10px">
       <div style="overflow:auto">
         <table id="tbl" style="width:100%; border-collapse:separate; border-spacing:0">
           <thead></thead>

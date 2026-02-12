@@ -2,8 +2,8 @@
   --bg: #0b0c10;
   --panel: #11131a;
   --panel-2: #161a24;
-  --text: #e9ecf1;
-  --muted: #a8b0c0;
+  --text: #ffffff;
+  --muted: #ffffff;
   --border: #252b3a;
 
   --accent: #7c3aed; /* changed in settings later */
@@ -17,7 +17,7 @@
 }
 
 [data-theme="light"] {
-  --bg: #f6f7fb;
+  --bg: #c9caca;
   --panel: #ffffff;
   --panel-2: #f0f2f7;
   --text: #111827;

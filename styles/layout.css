@@ -1,55 +1,72 @@
-#app-shell {
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  height: 100vh;
+#app-shell{
+  display:grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  min-height: 100dvh; /* вместо height:100vh */
 }
 
-#sidebar {
+/* sidebar */
+#sidebar{
   background: var(--panel);
   border-right: 1px solid var(--border);
   padding: 18px;
-  overflow: auto;
+  overflow:auto;
 }
 
-#main {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  overflow: hidden;
+/* main */
+#main{
+  display:grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
 }
 
-#topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+#topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
   gap: var(--gap);
   padding: 14px 18px;
   border-bottom: 1px solid var(--border);
   background: color-mix(in oklab, var(--panel) 88%, transparent);
   backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.topbar-left {
-  display: flex;
-  align-items: center;
+.topbar-left{
+  display:flex;
+  align-items:center;
   gap: 12px;
+  min-width: 0;
 }
 
-.page-title {
-  margin: 0;
+.page-title{
+  margin:0;
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.content {
+.content{
   padding: 18px;
-  overflow: auto;
+  overflow:auto;
+  min-width: 0;
 }
 
-@media (max-width: 980px) {
-  #app-shell {
-    grid-template-columns: 1fr;
-  }
-  #sidebar {
+/* ====== responsive helpers ====== */
+.container{
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- Tablet --- */
+@media (max-width: 980px){
+  #app-shell{ grid-template-columns: 1fr; }
+
+  /* sidebar overlay */
+  #sidebar{
     position: fixed;
     inset: 0 auto 0 0;
     width: 280px;
@@ -57,7 +74,26 @@
     transition: transform 180ms ease;
     z-index: 50;
   }
-  #sidebar.is-open {
-    transform: translateX(0);
+  #sidebar.is-open{ transform: translateX(0); }
+
+  /* topbar: разрешаем перенос */
+  #topbar{
+    flex-wrap: wrap;
+    align-items: flex-start;
   }
+
+  .content{ padding: 14px; }
+}
+
+/* --- Phone --- */
+@media (max-width: 640px){
+  #sidebar{ width: min(86vw, 320px); }
+  .content{ padding: 12px; }
+  #topbar{ padding: 12px; }
+  .page-title{ font-size: 16px; }
+}
+
+/* --- Small phone --- */
+@media (max-width: 380px){
+  .content{ padding: 10px; }
 }
